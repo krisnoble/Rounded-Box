@@ -4,7 +4,7 @@ Creates a custom sized box with rounded corners and a push-fit lid, without the 
 
 Options for holes, cable cutouts and two types of standoff for mounting PCBs and the like.
 
-
+<img src="https://github.com/krisnoble/Rounded-Box/blob/master/Rounded%20Box.png" width="800px" />
 
 ## Usage
 Load the file into OpenSCAD, then you can either edit the variables directly in the code, or use the [Customizer](https://www.dr-lex.be/3d-printing/customizer.html). Once you're happy, render the result, then export as an STL for slicing and printing.
