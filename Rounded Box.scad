@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 * Rounded Box
-* v0.1.0
+* v0.1.1
 * Kris Noble 2021
 * Licence: CC BY 4.0 https://creativecommons.org/licenses/by/4.0/
 * Derived from https://www.thingiverse.com/thing:1746190 by Simon John
@@ -26,7 +26,7 @@ print_lid = true;
 lip_width = 2;
 lip_height = 2;
 // May need adjusting +/- to get a good fit depending on your setup.
-lip_clearance = 0;
+lip_clearance = 0.00;
 
 /* [Holes] */
 // Hole format: [<horizontal offset>, <vertical offset>, <hole diameter>]. Offsets are calculated from the centre of the external face as viewed. Side holes are diamonds for easy printing.
@@ -57,7 +57,7 @@ pins_base = [];
 pins_lid  = [];
 
 /* [Sockets] */
-// Socket format: [<horizontal offset>, <vertical offset>, <height>, <inner diameter>, <outer diameter>]. Offsets apply to the central point of the mount and are calculated from the internal south-west / bottom-left of the base or lid as viewed from above. Lid socket offsets do not account for the lip.
+// Socket format: [<horizontal offset>, <vertical offset>, <height>, <inner diameter>, <outer diameter>]. Offsets apply to the central point of the socket and are calculated from the internal south-west / bottom-left of the base or lid as viewed from above. Lid socket offsets do not account for the lip.
 sockets_base = [];
 sockets_lid  = [];
 
@@ -72,7 +72,7 @@ resolution = 100;
 /* [Hidden] */
 // Set global resolution and Minkowski cylinder height
 $fn = resolution;
-cylinder_height = 0.000000001;
+minkowski_cylinder_height = 0.000000001;
 
 // Calculated values
 corner_radius = wall_thickness;
@@ -89,19 +89,19 @@ module normalBox(length, width, height)
 	cube(size=[width,length, height]);
 }
 
-module roundedBox(length, width, height, radius, cylinder_height=cylinder_height)
+module roundedBox(length, width, height, radius, minkowski_cylinder_height=minkowski_cylinder_height)
 {
 	minkowski() {
 		cube(size=[width-(radius*2),length-(radius*2), height]);
-		cylinder(r=radius, h=cylinder_height);
+		cylinder(r=radius, h=minkowski_cylinder_height);
 	}
 }
 
-module cutout(length, width, height, radius, cylinder_height=cylinder_height)
+module cutout(length, width, height, radius, minkowski_cylinder_height=minkowski_cylinder_height)
 {
 	minkowski() {
 		cube(size=[width-(radius*2),length-(radius*2), height]);
-		cylinder(r=radius, h=cylinder_height);
+		cylinder(r=radius, h=minkowski_cylinder_height);
 		
 	}
 	translate([-radius,0,0]){
@@ -146,7 +146,7 @@ translate([corner_radius, corner_radius, 0]) {
 				offset_x = cutout[0];
 				width = cutout[1];
 				height = cutout_from_lid ? cutout[2] : cutout[2]+lip_height;
-				radius = min(cutout_radius, (width/2)-cylinder_height, (height/2)-cylinder_height);
+				radius = min(cutout_radius, (width/2)-minkowski_cylinder_height, (height/2)-minkowski_cylinder_height);
 				
 				translate([internal_width/2-width/2+radius-offset_x,internal_length+wall_thickness+0.5,(box_height-height)+radius]) {
 					rotate([90,0,0]){
@@ -176,7 +176,7 @@ translate([corner_radius, corner_radius, 0]) {
 				offset_x = cutout[0];
 				width = cutout[1];
 				height = cutout_from_lid ? cutout[2] : cutout[2]+lip_height;
-				radius = min(cutout_radius, (width/2)-cylinder_height, (height/2)-cylinder_height);
+				radius = min(cutout_radius, (width/2)-minkowski_cylinder_height, (height/2)-minkowski_cylinder_height);
 				
 				translate([internal_width-0.5,(internal_length/2)-(width/2)+radius+offset_x,(box_height-height)+radius]) {
 					rotate([0,0,90]) rotate([90,0,0]){
@@ -203,7 +203,7 @@ translate([corner_radius, corner_radius, 0]) {
 				offset_x = cutout[0];
 				width = cutout[1];
 				height = cutout_from_lid ? cutout[2] : cutout[2]+lip_height;
-				radius = min(cutout_radius, (width/2)-cylinder_height, (height/2)-cylinder_height);
+				radius = min(cutout_radius, (width/2)-minkowski_cylinder_height, (height/2)-minkowski_cylinder_height);
 				
 				translate([(internal_width/2)-(width/2)+radius+offset_x,0.5,(box_height-height)+radius]) {
 					rotate([90,0,0]){
@@ -234,7 +234,7 @@ translate([corner_radius, corner_radius, 0]) {
 				offset_x = cutout[0];
 				width = cutout[1];
 				height = cutout_from_lid ? cutout[2] : cutout[2]+lip_height;
-				radius = min(cutout_radius, (width/2)-cylinder_height, (height/2)-cylinder_height);
+				radius = min(cutout_radius, (width/2)-minkowski_cylinder_height, (height/2)-minkowski_cylinder_height);
 				
 				translate([-wall_thickness-0.5,(internal_length/2)-(width/2)+radius-offset_x,box_height-height+radius]) {
 					rotate([0,0,90]) rotate([90,0,0]){
@@ -249,7 +249,7 @@ translate([corner_radius, corner_radius, 0]) {
 				offset_y = hole[1];
 				diameter = hole[2];
 				translate([(internal_width/2)+offset_x,(internal_length/2)+offset_y,-0.5]) {
-					cylinder(r=diameter/2, h=wall_thickness+1);
+					cylinder(d=diameter, h=wall_thickness+1);
 				}
 			}
 			
@@ -265,10 +265,10 @@ translate([corner_radius, corner_radius, 0]) {
 			upper_diameter = pin[5];
 			
 			translate([offset_x+wall_thickness,offset_y+wall_thickness,wall_thickness]) {
-				cylinder(r=lower_diameter/2, h=lower_height);
+				cylinder(d=lower_diameter, h=lower_height);
 			}
 			translate([offset_x+wall_thickness,offset_y+wall_thickness,wall_thickness+lower_height]) {
-				cylinder(r=upper_diameter/2, h=upper_height);
+				cylinder(d=upper_diameter, h=upper_height);
 			}
 		}
 		
@@ -282,10 +282,10 @@ translate([corner_radius, corner_radius, 0]) {
 			
 			difference(){
 				translate([offset_x+wall_thickness,offset_y+wall_thickness,wall_thickness]) {
-					cylinder(r=(outer_diameter)/2, h=height);
+					cylinder(d=outer_diameter, h=height);
 				}
 				translate([offset_x+wall_thickness,offset_y+wall_thickness,wall_thickness]) {
-					cylinder(r=inner_diameter/2, h=height+0.1);
+					cylinder(d=inner_diameter, h=height+0.1);
 				}
 			}
 		}
@@ -305,7 +305,7 @@ translate([corner_radius, corner_radius, 0]) {
 					offset_y = hole[1];
 					diameter = hole[2];
 					translate([(internal_width/2)+offset_x,(internal_length/2)+offset_y,-0.5]) {
-						cylinder(r=diameter/2, h=wall_thickness+1);
+						cylinder(d=diameter, h=wall_thickness+1);
 					}
 				}
 			}
@@ -372,10 +372,10 @@ translate([corner_radius, corner_radius, 0]) {
 					upper_diameter = pin[5];
 					
 					translate([offset_x+(wall_thickness),offset_y+(wall_thickness),wall_thickness]) {
-						cylinder(r=lower_diameter/2, h=lower_height);
+						cylinder(d=lower_diameter, h=lower_height);
 					}
 					translate([offset_x+(wall_thickness),offset_y+(wall_thickness),wall_thickness+lower_height]) {
-						cylinder(r=upper_diameter/2, h=upper_height);
+						cylinder(d=upper_diameter, h=upper_height);
 					}
 				}
 				
@@ -389,10 +389,10 @@ translate([corner_radius, corner_radius, 0]) {
 					
 					difference(){
 						translate([offset_x+(lip_clearance)+(wall_thickness),offset_y+lip_clearance+(wall_thickness),wall_thickness]) {
-							cylinder(r=(outer_diameter)/2, h=height);
+							cylinder(d=outer_diameter, h=height);
 						}
 						translate([offset_x+(lip_clearance)+(wall_thickness),offset_y+lip_clearance+(wall_thickness),wall_thickness]) {
-							cylinder(r=inner_diameter/2, h=height+0.1);
+							cylinder(d=inner_diameter, h=height+0.1);
 						}
 					}
 				}
