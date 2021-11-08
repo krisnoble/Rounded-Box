@@ -1,6 +1,6 @@
 # Rounded Box
 
-Creates a custom sized box with rounded corners and a push-fit lid, without the need for 3D modelling software or skills. 
+Creates a custom-sized box with rounded corners and a push-fit lid, without the need for 3D modelling software or skills. 
 
 Options for holes, cable cutouts and two types of standoff for mounting PCBs and the like.
 
@@ -49,7 +49,7 @@ You can also set `cutout_from_lid` to your liking. When set to `true`, this will
 ---
 
 ### Standoffs
-__N.b.__ standoffs calculate their position differently from holes, this is to make measuring easier when trying to match up to PCBs etc.
+__N.b.__ standoffs calculate their position differently from holes and cutouts, this is to make measuring easier when trying to match up to PCBs etc.
 
 Standoff offsets apply to their central point and are calculated from the internal south-west / bottom-left of the base or lid as viewed from above. Lid standoff offsets do not account for the lip automatically.
 
